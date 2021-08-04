@@ -1,0 +1,55 @@
+{
+  "name": "ziron-state",
+  "version": "0.0.1",
+  "description": "Ziron state",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "license": "UNLICENSED",
+  "files": [
+    "dist/**/*"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ZironServer/ziron-state.git"
+  },
+  "author": {
+    "name": "Luca Scaringella",
+    "email": "lucacode1@gmail.com",
+    "url": "https://luca.scaringella.de"
+  },
+  "dependencies": {
+    "ziron-server": "^0.0.17",
+    "log-update": "^4.0.0",
+    "table": "^6.7.1",
+    "ip": "^1.1.5",
+    "is-ip": "^3.1.0",
+    "uniqid": "^5.3.0",
+    "docker-secret": "^1.2.3"
+  },
+  "devDependencies": {
+    "typescript": "^3.7.5",
+    "gulp": "4.0.2",
+    "gulp-optimize-js": "1.1.0",
+    "gulp-terser": "1.2.0",
+    "gulp-typescript": "^5.0.1",
+    "del": "^5.1.0",
+    "ts-node": "^8.0.3",
+    "mocha": "7.0.1",
+    "@types/mocha": "^7.0.2",
+    "@types/ip": "^1.1.0",
+    "@types/uniqid": "^5.3.0"
+  },
+  "scripts": {
+    "build": "gulp build",
+    "prepublishOnly": "npm run build",
+    "start": "node dist/run.js",
+    "test": "mocha --exit -r ts-node/register test/**/*.ts"
+  },
+  "keywords": [
+    "websocket",
+    "realtime",
+    "ziron",
+    "fast",
+    "lightway"
+  ]
+}
