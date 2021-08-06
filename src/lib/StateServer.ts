@@ -40,7 +40,7 @@ type WorkerJoinMiddleware = (socket: Socket, payload: Record<any, any>) => Promi
 
 type ClusterSession = {
     id: string,
-    shared: object,
+    payload: object,
 };
 
 const CLUSTER_VERSION = 1;
@@ -168,10 +168,10 @@ export class StateServer {
         }
     }
 
-    private _createClusterSession(shared: object) {
+    private _createClusterSession(payload: object) {
         this._clusterSession = {
             id: uniqId(),
-            shared
+            payload
         };
     }
 
