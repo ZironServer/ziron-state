@@ -79,6 +79,7 @@ export class StateServer {
         this._joinToken = this._getJoinToken();
 
         this._server = new Server({
+            port: this._options.port,
             pingInterval: 1000,
             path: this._options.path
         });
@@ -88,7 +89,7 @@ export class StateServer {
     public async listen() {
         if(this._listenCalled) return;
         this._listenCalled = true;
-        await this._server.listen(this._options.port);
+        await this._server.listen();
         this._logger.logActive(`State server launched successfully on port: ${this._options.port}.`);
         this._logRunningState();
     }
