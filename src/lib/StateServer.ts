@@ -214,7 +214,7 @@ export class StateServer {
         }
 
         this._joinedWorkers[socket.node.id] = socket;
-        this._triggerWorkerLeaderSelection();
+        this._selectWorkerLeader();
 
         end({session: this._clusterSession, brokers: this.getJoinedBrokersState(),
             leader: this._workerLeader === socket});
@@ -226,7 +226,7 @@ export class StateServer {
         if(this._workerLeader === socket) {
             this._workerLeader = null;
             socket.node.leader = false;
-            this._triggerWorkerLeaderSelection();
+            this._selectWorkerLeader();
         }
         if(Object.keys(this._joinedWorkers).length === 0) this._resetClusterSession();
         this._logRunningState();
@@ -249,16 +249,12 @@ export class StateServer {
         return getRandomArrayItem(Object.values(this._joinedWorkers));
     }
 
-    private _selectWorkerLeaderProcessRunning: boolean = false;
-    private _triggerWorkerLeaderSelection() {
+    private _workerLeaderSelectionPromise: Promise<void> = Promise.resolve();
+    private _selectWorkerLeader() {
         // Make sure the selection of a leader is running atomic
         // to avoid multiple leaders selected.
-        // Also, if the selection is already running,
-        // we don't need to start it again afterwards.
-       if(this._selectWorkerLeaderProcessRunning) return;
-       this._selectWorkerLeaderProcessRunning = true;
-        // noinspection JSIgnoredPromiseFromCall
-       this._selectWorkerLeaderProcess();
+       this._workerLeaderSelectionPromise = this._workerLeaderSelectionPromise
+           .then(() => this._selectWorkerLeaderProcess());
     }
     private async _selectWorkerLeaderProcess() {
         let randomWorker: Socket | undefined;
@@ -268,7 +264,6 @@ export class StateServer {
             randomWorker!.node.leader = true;
             this._workerLeader = randomWorker!;
             this._logRunningState();
-            this._selectWorkerLeaderProcessRunning = false;
         }
     }
 
