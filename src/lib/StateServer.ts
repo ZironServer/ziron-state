@@ -104,7 +104,7 @@ export class StateServer {
         const address = ip.address();
         const path = this._options.path === "" || this._options.path === "/" ? "" :
             !this._options.path.startsWith("/") ? "/" + this._options.path : this._options.path;
-        return `${this._options.secret}@ws://${
+        return `${this._options.secret ? `${this._options.secret}@` : ""}ws://${
             isIp.v6(address) ? `[${address}]` : address
         }:${this._options.port}${path}`;
     }
