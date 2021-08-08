@@ -64,7 +64,7 @@ export class StateServer {
     private readonly _logger: Logger;
     private readonly _server: Server;
 
-    private readonly _joinToken: string;
+    public readonly joinToken: string;
     private _clusterSession: ClusterSession | null = null;
     private _scaleTimeout?: NodeJS.Timeout;
 
@@ -77,7 +77,7 @@ export class StateServer {
         this._logger = new Logger(this._options.logLevel);
         this._logger.logBusy('Launching state server...');
 
-        this._joinToken = this._getJoinToken();
+        this.joinToken = this._getJoinToken();
 
         this._server = new Server({
             port: this._options.port,
@@ -97,7 +97,7 @@ export class StateServer {
 
     private _logRunningState() {
         this._logger.logRunningState([...Object.values(this._joinedWorkers),
-            ...Object.values(this._joinedBrokers)],this._joinToken);
+            ...Object.values(this._joinedBrokers)],this.joinToken);
     }
 
     private _getJoinToken(): string {
