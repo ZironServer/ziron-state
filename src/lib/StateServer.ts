@@ -72,10 +72,11 @@ export class StateServer {
     public workerJoinMiddleware: WorkerJoinMiddleware | undefined;
 
     constructor(options: StateServerOptions = {}) {
+        this._options = buildOptions(this._options,options);
+
         this._logger = new Logger(this._options.logLevel);
         this._logger.logBusy('Launching state server...');
 
-        this._options = buildOptions(this._options,options);
         this._joinToken = this._getJoinToken();
 
         this._server = new Server({
