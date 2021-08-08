@@ -287,4 +287,13 @@ export class StateServer {
         });
     }
 
+    /**
+     * Terminates the state server.
+     * After termination, you should not use this instance anymore
+     * or anything else from the state server.
+     * [Use this method only when you know what you do.]
+     */
+    terminate() {
+        this._server.terminate();
+    }
 }
