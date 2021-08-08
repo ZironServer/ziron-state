@@ -51,7 +51,7 @@ export class StateServer {
 
     private readonly _options: Required<StateServerOptions> = {
         logLevel: 1,
-        secret: generateSecret().substring(0,64),
+        secret: generateSecret().substring(0,32),
         port: 7777,
         path: "/",
         scaleDelay: 100,
