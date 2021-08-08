@@ -33,7 +33,11 @@ export default class Logger {
     public logRunningState(joinedSockets: Socket[],joinToken: string) {
         if(this.level !== LogLevel.Everything) return;
 
-        const joinInformation = `Join a new broker or worker by using the join token: ${joinToken}.`;
+        const postFixInformation: string[] = [];
+        if(joinedSockets.filter(socket  => socket.node.type === ClientType.Broker).length <= 0)
+            postFixInformation.push("\x1b[33m[WARNING] The cluster has no brokers! Channel messages will not be distributed to other workers.\x1b[0m️️️");
+        postFixInformation.push(`Join a new broker or worker by using the join token: \x1b[36m${joinToken}\x1b[0m`);
+
         logUpdate(table([Logger.RUNNING_TABLE_HEADER,...joinedSockets
             .map(({node} )=> [
                 node.id,
@@ -44,9 +48,9 @@ export default class Logger {
         ],{
             header: {
                 alignment: 'center',
-                content: 'Joined nodes',
+                content: 'Cluster',
             },
-        }) + "\n" + joinInformation);
+        }) + postFixInformation.join("\n"));
     }
 
 }
