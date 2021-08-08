@@ -213,7 +213,7 @@ export class StateServer {
         }
 
         this._joinedWorkers[socket.node.id] = socket;
-        this._selectWorkerLeader();
+        this._triggerWorkerLeaderSelection();
 
         end({session: this._clusterSession, brokers: this.getJoinedBrokersState(),
             leader: this._workerLeader === socket});
@@ -224,7 +224,8 @@ export class StateServer {
         delete this._joinedWorkers[socket.node.id];
         if(this._workerLeader === socket) {
             this._workerLeader = null;
-            this._selectWorkerLeader();
+            socket.node.leader = false;
+            this._triggerWorkerLeaderSelection();
         }
         if(Object.keys(this._joinedWorkers).length === 0) this._resetClusterSession();
         this._logRunningState();
@@ -247,16 +248,26 @@ export class StateServer {
         return getRandomArrayItem(Object.values(this._joinedWorkers));
     }
 
-    private _selectWorkerLeader() {
+    private _selectWorkerLeaderProcessRunning: boolean = false;
+    private _triggerWorkerLeaderSelection() {
+        // Make sure the selection of a leader is running atomic
+        // to avoid multiple leaders selected.
+        // Also, if the selection is already running,
+        // we don't need to start it again afterwards.
+       if(this._selectWorkerLeaderProcessRunning) return;
+       this._selectWorkerLeaderProcessRunning = true;
+        // noinspection JSIgnoredPromiseFromCall
+       this._selectWorkerLeaderProcess();
+    }
+    private async _selectWorkerLeaderProcess() {
         let randomWorker: Socket | undefined;
         if(this._workerLeader == null && (randomWorker = this._getRandomWorker()) !== undefined) {
-            randomWorker.invoke('addLeadership').then(() => {
-                randomWorker!.node.leader = true;
-                this._workerLeader = randomWorker!;
-                this._logRunningState();
-            }).catch(() => {
-                this._selectWorkerLeader();
-            })
+            try {await randomWorker.invoke('addLeadership');}
+            catch (_) {return await this._selectWorkerLeaderProcess();}
+            randomWorker!.node.leader = true;
+            this._workerLeader = randomWorker!;
+            this._logRunningState();
+            this._selectWorkerLeaderProcessRunning = false;
         }
     }
 
