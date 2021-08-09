@@ -216,8 +216,7 @@ export class StateServer {
         this._joinedWorkers[socket.node.id] = socket;
         this._selectWorkerLeader();
 
-        end({session: this._clusterSession, brokers: this.getJoinedBrokersState(),
-            leader: this._workerLeader === socket});
+        end({session: this._clusterSession, brokers: this.getJoinedBrokersState()});
         this._logRunningState();
     }
 
