@@ -40,7 +40,7 @@ type WorkerJoinMiddleware = (socket: Socket, payload: Record<any, any>) => Promi
 
 type ClusterSession = {
     id: string,
-    payload: object,
+    shared: any,
 };
 
 const CLUSTER_VERSION = 1;
@@ -170,10 +170,10 @@ export class StateServer {
         }
     }
 
-    private _createClusterSession(payload: object) {
+    private _createClusterSession(shared: any) {
         this._clusterSession = {
             id: uniqId(),
-            payload
+            shared
         };
     }
 
@@ -210,7 +210,7 @@ export class StateServer {
         }
 
         if(Object.keys(this._joinedWorkers).length === 0) {
-            this._createClusterSession(typeof shared !== 'object' ? {} : shared);
+            this._createClusterSession(shared);
         }
 
         this._joinedWorkers[socket.node.id] = socket;
