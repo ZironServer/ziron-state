@@ -58,8 +58,8 @@ export class StateServer {
     };
 
     private _workerLeader: Socket | null = null;
-    private readonly _joinedWorkers: Record<string,Socket> = {};
-    private readonly _joinedBrokers: Record<string,Socket> = {};
+    private _joinedWorkers: Record<string,Socket> = {};
+    private _joinedBrokers: Record<string,Socket> = {};
 
     private readonly _logger: Logger;
     private readonly _server: Server;
@@ -293,6 +293,9 @@ export class StateServer {
      * [Use this method only when you know what you do.]
      */
     terminate() {
+        this._workerLeader = null;
+        this._joinedWorkers = {};
+        this._joinedBrokers = {};
         this._server.terminate();
     }
 }
