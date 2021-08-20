@@ -5,7 +5,9 @@ Copyright(c) Luca Scaringella
  */
 
 import {StateServer} from "./lib/StateServer";
+import {LogLevel} from "./lib/Logger";
 
 export {
-    StateServer
+    StateServer,
+    LogLevel
 }
