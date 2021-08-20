@@ -14,7 +14,7 @@ process.title = `Ziron State`;
 new StateServer({
     secret: variables.SECRET,
     port: parseInt(variables.PORT) || 7777,
-    path: variables.PATH || "/",
+    path: variables.SERVER_PATH || "/",
     logLevel: parseInt(variables.LOG_LEVEL) || LogLevel.Everything,
     scaleDelay: parseInt(variables.SCALE_DELAY) || 100
 }).listen();
