@@ -18,7 +18,7 @@
     "url": "https://luca.scaringella.de"
   },
   "dependencies": {
-    "ziron-server": "^0.5.0",
+    "ziron-server": "^0.6.0",
     "log-update": "^4.0.0",
     "table": "^6.7.2",
     "ip": "^1.1.5",
