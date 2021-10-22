@@ -17,4 +17,4 @@ new StateServer({
     path: variables.SERVER_PATH || "/",
     logLevel: parseInt(variables.LOG_LEVEL) || LogLevel.Everything,
     scaleDelay: parseInt(variables.SCALE_DELAY) || 100
-}).listen();
+}).listen().catch(() => process.exit(1));
