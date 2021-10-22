@@ -15,6 +15,6 @@ new StateServer({
     secret: variables.SECRET,
     port: parseInt(variables.PORT) || 7777,
     path: variables.SERVER_PATH || "/",
-    logLevel: parseInt(variables.LOG_LEVEL) || LogLevel.Everything,
+    logLevel: isNaN(parseInt(variables.LOG_LEVEL)) ? LogLevel.Everything : parseInt(variables.LOG_LEVEL),
     scaleDelay: parseInt(variables.SCALE_DELAY) || 100
 }).listen().catch(() => process.exit(1));
