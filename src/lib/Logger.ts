@@ -19,19 +19,19 @@ export default class Logger {
     constructor(private readonly level: LogLevel) {}
 
     public logBusy(...msg: string[]) {
-        if (this.level === LogLevel.Everything)
+        if (this.level >= LogLevel.Everything)
             console.log('\x1b[33m%s\x1b[0m', '   [BUSY]',msg.join('\n'));
     }
 
     public logActive(...msg: string[]) {
-        if (this.level === LogLevel.Everything)
+        if (this.level >= LogLevel.Everything)
             console.log('\x1b[32m%s\x1b[0m', '   [ACTIVE]',msg.join('\n'));
     }
 
     private static RUNNING_TABLE_HEADER = ["Id","Type","IP","Port"];
 
     public logRunningState(joinedWorkers: Socket[],joinedBrokers: Socket[],joinToken: string) {
-        if(this.level !== LogLevel.Everything) return;
+        if(this.level <= LogLevel.Nothing) return;
 
         const postFixInformation: string[] = [];
         if(joinedWorkers.length > 1 && joinedBrokers.length <= 0)
