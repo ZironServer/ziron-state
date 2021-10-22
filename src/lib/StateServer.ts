@@ -96,8 +96,8 @@ export class StateServer {
     }
 
     private _logRunningState() {
-        this._logger.logRunningState([...Object.values(this._joinedWorkers),
-            ...Object.values(this._joinedBrokers)],this.joinToken);
+        this._logger.logRunningState(Object.values(this._joinedWorkers),
+            Object.values(this._joinedBrokers),this.joinToken);
     }
 
     private _getJoinToken(): string {
