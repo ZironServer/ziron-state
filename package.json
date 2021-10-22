@@ -13,9 +13,8 @@
     "url": "https://github.com/ZironServer/ziron-state.git"
   },
   "author": {
-    "name": "Luca Scaringella",
-    "email": "lucacode1@gmail.com",
-    "url": "https://luca.scaringella.de"
+    "name": "Ing. Luca Gian Scaringella",
+    "email": "lucacode1@gmail.com"
   },
   "dependencies": {
     "ziron-server": "^1.0.0",
