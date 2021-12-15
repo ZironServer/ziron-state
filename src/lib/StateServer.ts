@@ -4,7 +4,7 @@ GitHub: LucaCode
 Copyright(c) Ing. Luca Gian Scaringella
  */
 
-import {Block, prepareMultiTransmit, Server, Socket} from "ziron-server";
+import {Block, Server, Socket} from "ziron-server";
 import StateServerOptions from "./StateServerOptions";
 import Logger from "./Logger";
 import {generateSecret, getRandomArrayItem} from "./Crypto";
@@ -214,6 +214,7 @@ export class StateServer {
         }
 
         this._joinedWorkers[socket.node.id] = socket;
+        socket.join('JoinedWorkers');
         this._selectWorkerLeader();
 
         end({session: this._clusterSession, brokers: this.getJoinedBrokersState()});
@@ -222,6 +223,7 @@ export class StateServer {
 
     private _handleWorkerLeave: SocketLeaveListener = (socket) => {
         delete this._joinedWorkers[socket.node.id];
+        socket.leave('JoinedWorkers');
         if(this._workerLeader === socket) {
             this._workerLeader = null;
             socket.node.leader = false;
@@ -280,10 +282,7 @@ export class StateServer {
     }
 
     private _updateWorkersBrokerState() {
-        const preparedPackage = prepareMultiTransmit("updateBrokers", this.getJoinedBrokersState());
-        Object.values(this._joinedWorkers).forEach(worker => {
-            worker.sendPreparedPackage(preparedPackage);
-        });
+        this._server.transmitToGroup("JoinedWorkers","updateBrokers", this.getJoinedBrokersState())
     }
 
     /**
