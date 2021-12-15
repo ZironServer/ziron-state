@@ -4,7 +4,7 @@ GitHub: LucaCode
 Copyright(c) Ing. Luca Gian Scaringella
  */
 
-import logUpdate = require('log-update');
+import logUpdate from 'log-update';
 import {Socket} from "ziron-server";
 import {table} from 'table';
 import {ClientType} from "./StateServer";
