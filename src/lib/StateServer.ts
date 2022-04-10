@@ -155,7 +155,7 @@ export class StateServer {
                 () => this._handleWorkerLeave(socket) :
                 () => this._handleBrokerLeave(socket)
             );
-            socket.procedures.leave = type === ClientType.Worker ?
+            socket.procedures["#leave"] = type === ClientType.Worker ?
                 (_,end) => {
                     this._handleWorkerLeave(socket);
                     end();
@@ -164,7 +164,7 @@ export class StateServer {
                     this._handleBrokerLeave(socket);
                     end();
                 }
-            socket.procedures.join = type === ClientType.Worker ?
+            socket.procedures["#join"] = type === ClientType.Worker ?
                 (...args) => this._handleWorkerJoin(socket,...args) :
                 (...args) => this._handleBrokerJoin(socket,...args);
         }
