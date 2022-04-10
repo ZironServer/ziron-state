@@ -24,7 +24,7 @@
     "ip": "^1.1.5",
     "is-ip": "^3.1.0",
     "uniqid": "^5.4.0",
-    "docker-secret": "^1.2.3"
+    "docker-secret": "^1.2.4"
   },
   "devDependencies": {
     "typescript": "^3.7.5",
