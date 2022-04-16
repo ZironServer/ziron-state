@@ -4,7 +4,12 @@ GitHub: LucaCode
 Copyright(c) Ing. Luca Gian Scaringella
  */
 
-import {Block, Server, Socket} from "ziron-server";
+import {
+    applyStandaloneProcedures, applyStandaloneReceivers,
+    Block,
+    Server,
+    Socket
+} from "ziron-server";
 import StateServerOptions from "./StateServerOptions";
 import Logger from "./Logger";
 import {generateSecret, getRandomArrayItem} from "./Crypto";
@@ -13,6 +18,8 @@ import * as uniqId from "uniqid";
 import ip = require('ip');
 import isIp = require('is-ip');
 import {buildOptions} from "./Object";
+import {StandaloneProcedures} from "ziron-server/dist/lib/Procedure";
+import {StandaloneReceivers} from "ziron-server/dist/lib/Receiver";
 
 export const enum ClientType {
     Worker = 0,
@@ -70,6 +77,9 @@ export class StateServer {
 
     //Middlewares
     public workerJoinMiddleware: WorkerJoinMiddleware | undefined;
+
+    public readonly procedures: StandaloneProcedures<'#leave' | '#join'> = {};
+    public readonly receivers: StandaloneReceivers = {};
 
     constructor(options: StateServerOptions = {}) {
         this._options = buildOptions(this._options,options);
@@ -155,6 +165,8 @@ export class StateServer {
                 () => this._handleWorkerLeave(socket) :
                 () => this._handleBrokerLeave(socket)
             );
+            applyStandaloneProcedures(socket,this.procedures);
+            applyStandaloneReceivers(socket,this.receivers);
             socket.procedures["#leave"] = type === ClientType.Worker ?
                 (_,end) => {
                     this._handleWorkerLeave(socket);
