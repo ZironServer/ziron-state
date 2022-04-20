@@ -20,6 +20,7 @@ import isIp = require('is-ip');
 import {buildOptions} from "./Object";
 import {StandaloneProcedures} from "ziron-server/dist/lib/Procedure";
 import {StandaloneReceivers} from "ziron-server/dist/lib/Receiver";
+import {IdAlreadyUsedInClusterError} from "./Errors";
 
 export const enum ClientType {
     Worker = 0,
@@ -221,9 +222,10 @@ export class StateServer {
             }
         }
 
-        if(Object.keys(this._joinedWorkers).length === 0) {
+        if(this._isNodeIdInUse(socket.node.id))
+            return reject(new IdAlreadyUsedInClusterError(socket.node.id));
+        if(Object.keys(this._joinedWorkers).length === 0)
             this._createClusterSession(shared);
-        }
 
         this._joinedWorkers[socket.node.id] = socket;
         socket.join('JoinedWorkers');
@@ -245,7 +247,9 @@ export class StateServer {
         this._logRunningState();
     }
 
-    private _handleBrokerJoin: SocketProcedureListener = (socket,data,end) => {
+    private _handleBrokerJoin: SocketProcedureListener = (socket,data,end,reject) => {
+        if(this._isNodeIdInUse(socket.node.id))
+            return reject(new IdAlreadyUsedInClusterError(socket.node.id));
         this._joinedBrokers[socket.node.id] = socket;
         this._scaleOut();
         end();
@@ -295,6 +299,10 @@ export class StateServer {
 
     private _updateWorkersBrokerState() {
         this._server.transmitToGroup("JoinedWorkers","updateBrokers", this.getJoinedBrokersState())
+    }
+
+    private _isNodeIdInUse(id: string) {
+        return this._joinedWorkers.hasOwnProperty(id) || this._joinedBrokers.hasOwnProperty(id) || id === this._server.id;
     }
 
     /**
