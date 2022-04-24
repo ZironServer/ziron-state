@@ -55,6 +55,8 @@ const CLUSTER_VERSION = 1;
 
 export class StateServer {
 
+    get id() {return this.server.id;}
+
     private _listenCalled: boolean = false;
 
     private readonly _options: Required<StateServerOptions> = {
