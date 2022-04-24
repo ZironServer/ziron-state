@@ -70,7 +70,13 @@ export class StateServer {
     private _joinedBrokers: Record<string,Socket> = {};
 
     private readonly _logger: Logger;
-    private readonly _server: Server;
+    /**
+     * @description
+     * Use the server object carefully.
+     * Never change properties on the server; use it only to access state information.
+     * @protected
+     */
+    protected readonly server: Server;
 
     public readonly joinToken: string;
     private _clusterSession: ClusterSession | null = null;
@@ -90,7 +96,7 @@ export class StateServer {
 
         this.joinToken = this._getJoinToken();
 
-        this._server = new Server({
+        this.server = new Server({
             port: this._options.port,
             pingInterval: 1000,
             path: this._options.path
@@ -101,7 +107,7 @@ export class StateServer {
     public async listen() {
         if(this._listenCalled) return;
         this._listenCalled = true;
-        await this._server.listen();
+        await this.server.listen();
         this._logger.logActive(`State server launched successfully on port: ${this._options.port}.`);
         this._logRunningState();
     }
@@ -121,7 +127,7 @@ export class StateServer {
     }
 
     private _initServer() {
-        this._server.upgradeMiddleware = req => {
+        this.server.upgradeMiddleware = req => {
             const attachment = req.attachment;
 
             if(typeof attachment !== 'object')
@@ -133,7 +139,7 @@ export class StateServer {
             if(attachment.clusterVersion !== CLUSTER_VERSION)
                 throw new Block(412,'Incompatible cluster versions');
         };
-        this._server.socketMiddleware = socket => {
+        this.server.socketMiddleware = socket => {
             const node = socket.handshakeAttachment.node;
             if(typeof node === 'object' &&
                 (node.type === ClientType.Worker || node.type === ClientType.Broker) &&
@@ -160,7 +166,7 @@ export class StateServer {
             }
             throw new Block(4005,'Invalid attachment structure');
         }
-        this._server.connectionHandler = (socket: Socket) => {
+        this.server.connectionHandler = (socket: Socket) => {
             const type = socket.node.type;
             socket.on('disconnect',type === ClientType.Worker ?
                 () => this._handleWorkerLeave(socket) :
@@ -298,11 +304,11 @@ export class StateServer {
     }
 
     private _updateWorkersBrokerState() {
-        this._server.transmitToGroup("JoinedWorkers","updateBrokers", this.getJoinedBrokersState())
+        this.server.transmitToGroup("JoinedWorkers","updateBrokers", this.getJoinedBrokersState())
     }
 
     private _isNodeIdInUse(id: string) {
-        return this._joinedWorkers.hasOwnProperty(id) || this._joinedBrokers.hasOwnProperty(id) || id === this._server.id;
+        return this._joinedWorkers.hasOwnProperty(id) || this._joinedBrokers.hasOwnProperty(id) || id === this.server.id;
     }
 
     /**
@@ -315,6 +321,6 @@ export class StateServer {
         this._workerLeader = null;
         this._joinedWorkers = {};
         this._joinedBrokers = {};
-        this._server.terminate();
+        this.server.terminate();
     }
 }
