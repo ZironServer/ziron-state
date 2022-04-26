@@ -8,12 +8,12 @@ import {
     applyStandaloneProcedures, applyStandaloneReceivers,
     Block,
     Server,
-    Socket
+    Socket,
+    StandaloneProcedure
 } from "ziron-server";
 import StateServerOptions from "./StateServerOptions";
 import Logger from "./Logger";
 import {generateSecret, getRandomArrayItem} from "./Crypto";
-import {DataType} from "ziron-engine";
 import * as uniqId from "uniqid";
 import ip = require('ip');
 import isIp = require('is-ip');
@@ -41,8 +41,6 @@ declare module 'ziron-server' {
     }
 }
 
-type SocketProcedureListener = (socket: Socket, data: any, end: (data?: any) => void,
-                                reject: (err?: any) => void, type: DataType) => void | Promise<void>;
 type SocketLeaveListener = (socket: Socket) => void | Promise<void>;
 type WorkerJoinMiddleware = (socket: Socket, payload: Record<any, any>) => Promise<void> | void;
 
@@ -56,8 +54,6 @@ const CLUSTER_VERSION = 1;
 export class StateServer {
 
     get id() {return this.server.id;}
-
-    private _listenCalled: boolean = false;
 
     private readonly _options: Required<StateServerOptions> = {
         logLevel: 1,
@@ -107,8 +103,7 @@ export class StateServer {
     }
 
     public async listen() {
-        if(this._listenCalled) return;
-        this._listenCalled = true;
+        if(this.server.isListening()) return;
         await this.server.listen();
         this._logger.logActive(`State server launched successfully on port: ${this._options.port}.`);
         this._logRunningState();
@@ -219,7 +214,10 @@ export class StateServer {
         return StateServer._getJoinedState(this._joinedWorkers);
     }
 
-    private _handleWorkerJoin: SocketProcedureListener = async (socket,data,end,reject) => {
+    private _handleWorkerJoin: StandaloneProcedure = async (socket,data,end,reject) => {
+        if(this._joinedWorkers[socket.node.id] === socket)
+            return end({session: this._clusterSession, brokers: this.getJoinedBrokersState()});
+
         if(typeof data !== 'object') data = {};
         const {shared, payload} = data;
 
@@ -244,7 +242,9 @@ export class StateServer {
     }
 
     private _handleWorkerLeave: SocketLeaveListener = (socket) => {
-        delete this._joinedWorkers[socket.node.id];
+        const nodeId = socket.node.id;
+        if(this._joinedWorkers[nodeId] !== socket) return;
+        delete this._joinedWorkers[nodeId];
         socket.leave('JoinedWorkers');
         if(this._workerLeader === socket) {
             this._workerLeader = null;
@@ -255,16 +255,20 @@ export class StateServer {
         this._logRunningState();
     }
 
-    private _handleBrokerJoin: SocketProcedureListener = (socket,data,end,reject) => {
-        if(this._isNodeIdInUse(socket.node.id))
-            return reject(new IdAlreadyUsedInClusterError(socket.node.id));
-        this._joinedBrokers[socket.node.id] = socket;
+    private _handleBrokerJoin: StandaloneProcedure = (socket,data,end,reject) => {
+        const nodeId = socket.node.id;
+        if(this._joinedBrokers[nodeId] === socket) return end();
+        if(this._isNodeIdInUse(nodeId))
+            return reject(new IdAlreadyUsedInClusterError(nodeId));
+        this._joinedBrokers[nodeId] = socket;
         this._scaleOut();
         end();
         this._logRunningState();
     }
 
     private _handleBrokerLeave: SocketLeaveListener = (socket) => {
+        const nodeId = socket.node.id;
+        if(this._joinedBrokers[nodeId] !== socket) return;
         delete this._joinedBrokers[socket.node.id];
         this._scaleBack();
         this._logRunningState();
