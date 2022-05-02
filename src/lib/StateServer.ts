@@ -183,6 +183,8 @@ export class StateServer {
             socket.procedures["#join"] = type === ClientType.Worker ?
                 (...args) => this._handleWorkerJoin(socket,...args) :
                 (...args) => this._handleBrokerJoin(socket,...args);
+
+            return this.id;
         }
     }
 
