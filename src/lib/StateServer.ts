@@ -90,7 +90,6 @@ export class StateServer {
         this._options = buildOptions(this._options,options);
 
         this._logger = new Logger(this._options.logLevel);
-        this._logger.logBusy('Launching state server...');
 
         this.joinToken = this._getJoinToken();
 
@@ -104,6 +103,7 @@ export class StateServer {
 
     public async listen() {
         if(this.server.isListening()) return;
+        this._logger.logBusy('Launching state server...');
         await this.server.listen();
         this._logger.logActive(`State server launched successfully on port: ${this._options.port}.`);
         this._logRunningState();
