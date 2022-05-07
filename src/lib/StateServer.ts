@@ -61,6 +61,7 @@ export class StateServer {
         port: 7777,
         path: "/",
         scaleDelay: 100,
+        initScaleDelay: 4000
     };
 
     private _workerLeader: Socket | null = null;
@@ -101,10 +102,19 @@ export class StateServer {
         this._initServer();
     }
 
+    private _initScaleDelayActive = true;
+    private _startInitScaleDelayTicker() {
+        setTimeout(() => {
+            this._initScaleDelayActive = false;
+            this._updateWorkersBrokerState();
+        },this._options.initScaleDelay)
+    }
+
     public async listen() {
         if(this.server.isListening()) return;
         this._logger.logBusy('Launching state server...');
         await this.server.listen();
+        this._startInitScaleDelayTicker();
         this._logger.logActive(`State server launched successfully on port: ${this._options.port}.`);
         this._logRunningState();
     }
@@ -239,7 +249,8 @@ export class StateServer {
         socket.join('JoinedWorkers');
         this._selectWorkerLeader();
 
-        end({session: this._clusterSession, brokers: this.getJoinedBrokersState()});
+        end({session: this._clusterSession, brokers: this._initScaleDelayActive ?
+                null : this.getJoinedBrokersState()});
         this._logRunningState();
     }
 

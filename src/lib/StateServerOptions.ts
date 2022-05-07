@@ -11,5 +11,6 @@ export default interface StateServerOptions {
     secret?: string,
     port?: number,
     path?: string,
-    scaleDelay?: number,
+    scaleDelay?: number
+    initScaleDelay?: number
 }
