@@ -6,7 +6,7 @@ Copyright(c) Ing. Luca Gian Scaringella
 
 import {
     applyStandaloneProcedures, applyStandaloneReceivers,
-    Block,
+    Block, FailedToListenError,
     Server,
     Socket,
     StandaloneProcedure
@@ -112,11 +112,18 @@ export class StateServer {
 
     public async listen() {
         if(this.server.isListening()) return;
-        this._logger.logBusy('Launching state server...');
-        await this.server.listen();
-        this._startInitScaleDelayTicker();
-        this._logger.logActive(`State server launched successfully on port: ${this._options.port}.`);
-        this._logRunningState();
+        try {
+            this._logger.logBusy('Launching state server...');
+            await this.server.listen();
+            this._startInitScaleDelayTicker();
+            this._logger.logActive(`State server launched successfully on port: ${this._options.port}.`);
+            this._logRunningState();
+        }
+        catch (err) {
+            if(err instanceof FailedToListenError)
+                this._logger.logFailed(`Failed to listen on port: ${this._options.port}. Maybe the port is already in use.`);
+            throw err;
+        }
     }
 
     private _logRunningState() {

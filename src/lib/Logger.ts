@@ -28,6 +28,11 @@ export default class Logger {
             console.log('\x1b[32m%s\x1b[0m', '   [ACTIVE]',msg.join('\n'));
     }
 
+    public logFailed(...msg: string[]) {
+        if (this.level >= LogLevel.Everything)
+            console.log("\x1b[31m%s\x1b[0m", "   [FAILED]", msg.join("\n"));
+    }
+
     private static RUNNING_TABLE_HEADER = ["Id","Type","IP","Port"];
 
     public logRunningState(joinedWorkers: Socket[],joinedBrokers: Socket[],joinToken: string) {
