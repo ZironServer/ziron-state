@@ -43,7 +43,7 @@ declare module 'ziron-server' {
 }
 
 type SocketLeaveListener = (socket: Socket) => void | Promise<void>;
-type WorkerJoinMiddleware = (socket: Socket, payload: Record<any, any>) => Promise<void> | void;
+type WorkerJoinMiddleware = (socket: Socket, payload: Record<any, any>) => void;
 
 type ClusterSession = {
     id: string,
@@ -238,7 +238,7 @@ export class StateServer {
         return StateServer._getJoinedState(this._joinedWorkers);
     }
 
-    private _handleWorkerJoin: StandaloneProcedure = async (socket,data,end,reject) => {
+    private _handleWorkerJoin: StandaloneProcedure = (socket,data,end,reject) => {
         if(this._joinedWorkers[socket.node.id] === socket)
             return end({session: this._clusterSession, brokers: this.getJoinedBrokersState()});
 
@@ -247,7 +247,7 @@ export class StateServer {
         if(typeof payload !== 'object') payload = {};
 
         if(this.workerJoinMiddleware){
-            try {await this.workerJoinMiddleware(socket,payload)}
+            try {this.workerJoinMiddleware(socket,payload)}
             catch (err) {
                 return reject((err instanceof Block) ? err :
                     new Error('Join was blocked by the join middleware'));
