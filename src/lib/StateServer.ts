@@ -243,7 +243,8 @@ export class StateServer {
         if(this.workerJoinMiddleware){
             try {await this.workerJoinMiddleware(socket,typeof payload !== 'object' ? {} : payload)}
             catch (err) {
-                return reject(new Error(err.message || 'Join was blocked by the join middleware'));
+                return reject((err instanceof Block) ? err :
+                    new Error('Join was blocked by the join middleware'));
             }
         }
 
