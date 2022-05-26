@@ -69,9 +69,9 @@ export class StateServer {
     private _joinedWorkers: Record<string,Socket> = {};
     private _joinedBrokers: Record<string,Socket> = {};
 
-    get joinedWorkers(): Socket[] {return Object.values(this._joinedWorkers);}
-    get joinedBrokers(): Socket[] {return Object.values(this._joinedBrokers);}
-    get workerLeader(): Socket | null {return this._workerLeader;}
+    protected get joinedWorkers(): Socket[] {return Object.values(this._joinedWorkers);}
+    protected get joinedBrokers(): Socket[] {return Object.values(this._joinedBrokers);}
+    protected get workerLeader(): Socket | null {return this._workerLeader;}
 
     private readonly _logger: Logger;
     /**
@@ -80,17 +80,17 @@ export class StateServer {
      * Never change properties on the server; use it only to access state information.
      * @protected
      */
-    readonly server: Server;
+    protected readonly server: Server;
 
     public readonly joinToken: string;
     private _clusterSession: ClusterSession | null = null;
     private _scaleTimeout?: NodeJS.Timeout;
 
     //Middlewares
-    public workerJoinMiddleware: WorkerJoinMiddleware | undefined;
+    protected workerJoinMiddleware: WorkerJoinMiddleware | undefined;
 
-    public readonly procedures: StandaloneProcedures<'#leave' | '#join'> = {};
-    public readonly receivers: StandaloneReceivers = {};
+    protected readonly procedures: StandaloneProcedures<'#leave' | '#join'> = {};
+    protected readonly receivers: StandaloneReceivers = {};
 
     constructor(options: StateServerOptions = {}) {
         this._options = buildOptions(this._options,options);
