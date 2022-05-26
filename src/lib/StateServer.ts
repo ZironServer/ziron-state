@@ -80,7 +80,7 @@ export class StateServer {
      * Never change properties on the server; use it only to access state information.
      * @protected
      */
-    protected readonly server: Server;
+    readonly server: Server;
 
     public readonly joinToken: string;
     private _clusterSession: ClusterSession | null = null;
