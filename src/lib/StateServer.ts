@@ -69,6 +69,10 @@ export class StateServer {
     private _joinedWorkers: Record<string,Socket> = {};
     private _joinedBrokers: Record<string,Socket> = {};
 
+    get joinedWorkers(): Socket[] {return Object.values(this._joinedWorkers);}
+    get joinedBrokers(): Socket[] {return Object.values(this._joinedBrokers);}
+    get workerLeader(): Socket | null {return this._workerLeader;}
+
     private readonly _logger: Logger;
     /**
      * @description
