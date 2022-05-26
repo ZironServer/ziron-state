@@ -18,7 +18,7 @@
     "email": "lucacode1@gmail.com"
   },
   "dependencies": {
-    "ziron-server": "8.0.0",
+    "ziron-server": "8.2.0",
     "log-update": "^4.0.0",
     "table": "^6.7.5",
     "ip": "^1.1.8",
