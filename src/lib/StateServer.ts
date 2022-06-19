@@ -165,9 +165,13 @@ export class StateServer {
                 typeof node.id === 'string' && typeof node.port === 'number' &&
                 typeof node.path === 'string')
             {
-                const nodeIp = typeof node.ip === 'string' && isIp(node.ip) ?
-                    node.ip : socket.remoteAddress;
-                if(!nodeIp) throw new Block(4012,'Could not detect node IP address');
+                const remoteAddress = socket.remoteAddress;
+                let nodeIp: string;
+                if(remoteAddress && isIp(remoteAddress))
+                    nodeIp = remoteAddress;
+                else if(typeof node.ip === 'string' && isIp(node.ip))
+                    nodeIp = node.ip;
+                else throw new Block(4012,'Could not detect node IP address');
 
                 if(node.path !== "" && !node.path.startsWith('/'))
                     throw new Block(4005,'Invalid node path');
