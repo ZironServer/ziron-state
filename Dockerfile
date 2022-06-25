@@ -21,4 +21,4 @@ HEALTHCHECK --interval=15s --timeout=15s --start-period=10s \
 
 EXPOSE 7777
 
-CMD npm run start
+CMD node dist/run.js
