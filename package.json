@@ -1,6 +1,6 @@
 {
   "name": "ziron-state",
-  "version": "8.7.0",
+  "version": "8.8.0",
   "description": "Ziron state",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
