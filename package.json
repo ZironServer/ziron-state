@@ -18,7 +18,7 @@
     "email": "lucacode1@gmail.com"
   },
   "dependencies": {
-    "ziron-server": "9.8.0",
+    "ziron-server": "9.9.0",
     "log-update": "^4.0.0",
     "table": "^6.7.5",
     "ip": "^1.1.8",
@@ -38,6 +38,11 @@
     "@types/mocha": "^7.0.2",
     "@types/ip": "^1.1.0",
     "@types/uniqid": "^5.3.2"
+  },
+  "overrides": {
+    "gulp-typescript": {
+      "source-map": "0.7.4"
+    }
   },
   "scripts": {
     "build": "gulp build",
