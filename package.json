@@ -18,7 +18,7 @@
     "email": "lucacode1@gmail.com"
   },
   "dependencies": {
-    "ziron-server": "9.9.1",
+    "ziron-server": "9.9.3",
     "log-update": "^4.0.0",
     "table": "^6.7.5",
     "ip": "^1.1.8",
@@ -27,15 +27,13 @@
     "docker-secret": "^1.2.4"
   },
   "devDependencies": {
-    "typescript": "^3.7.5",
-    "gulp": "4.0.2",
+    "typescript": "^5.8.3",
+    "gulp": "^5.0.1",
     "gulp-optimize-js": "1.1.0",
     "gulp-terser": "1.2.0",
     "gulp-typescript": "^5.0.1",
     "del": "^5.1.0",
     "ts-node": "^8.0.3",
-    "mocha": "7.0.1",
-    "@types/mocha": "^7.0.2",
     "@types/ip": "^1.1.0",
     "@types/uniqid": "^5.3.2"
   },
