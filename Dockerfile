@@ -1,18 +1,18 @@
-FROM node:16.13.0-stretch as build
+FROM node:20 AS build
 WORKDIR /usr/app/
 COPY . .
-RUN npm install
+RUN npm ci
 RUN npm run build
 
 
-FROM node:16.13.0-slim
+FROM node:20-slim
 
 LABEL description="Ziron state"
 
 WORKDIR /usr/app
 
 COPY package*.json ./
-RUN npm ci --only=production
+RUN npm ci --omit=dev
 
 COPY --from=build /usr/app/dist ./dist
 
