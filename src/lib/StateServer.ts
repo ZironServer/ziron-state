@@ -4,6 +4,7 @@ GitHub: LucaCode
 Copyright(c) Ing. Luca Gian Scaringella
  */
 
+import {timingSafeEqual} from "crypto";
 import {
     applyStandaloneProcedures, applyStandaloneReceivers,
     Block, FailedToListenError,
@@ -51,6 +52,15 @@ type ClusterSession = {
 };
 
 const CLUSTER_VERSION = 1;
+
+/**
+ * Compares the join secret in constant time.
+ */
+function secretEquals(value: unknown, secret: string | undefined): boolean {
+    if(typeof value !== 'string' || typeof secret !== 'string') return value == null && secret == null;
+    const a = Buffer.from(value), b = Buffer.from(secret);
+    return a.length === b.length && timingSafeEqual(a,b);
+}
 
 export class StateServer {
 
@@ -108,8 +118,9 @@ export class StateServer {
     }
 
     private _initScaleDelayActive = true;
+    private _initScaleTimer?: NodeJS.Timeout;
     private _startInitScaleDelayTicker() {
-        setTimeout(() => {
+        this._initScaleTimer = setTimeout(() => {
             this._initScaleDelayActive = false;
             this._updateWorkersBrokerState();
         },this._options.initScaleDelay)
@@ -149,10 +160,10 @@ export class StateServer {
         this.server.upgradeMiddleware = req => {
             const attachment = req.attachment;
 
-            if(typeof attachment !== 'object')
+            if(attachment == null || typeof attachment !== 'object')
                 throw new Block(400,'Invalid attachment structure');
 
-            if(attachment.secret !== this._options.secret)
+            if(!secretEquals(attachment.secret,this._options.secret))
                 throw new Block(403,'Permission denied');
 
             if(attachment.clusterVersion !== CLUSTER_VERSION)
@@ -246,7 +257,7 @@ export class StateServer {
         if(this._joinedWorkers[socket.node.id] === socket)
             return end({session: this._clusterSession, brokers: this.getJoinedBrokersState()});
 
-        if(typeof data !== 'object') data = {};
+        if(data == null || typeof data !== 'object') data = {};
         let {shared, payload} = data;
         if(typeof payload !== 'object') payload = {};
 
@@ -356,6 +367,8 @@ export class StateServer {
      * [Use this method only when you know what you do.]
      */
     terminate() {
+        clearTimeout(this._scaleTimeout);
+        clearTimeout(this._initScaleTimer);
         this._workerLeader = null;
         this._joinedWorkers = {};
         this._joinedBrokers = {};
