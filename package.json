@@ -18,24 +18,21 @@
     "email": "lucacode1@gmail.com"
   },
   "dependencies": {
-    "ziron-server": "9.10.0",
+    "docker-secret": "^1.2.4",
+    "is-ip": "^3.1.0",
     "log-update": "^4.0.0",
     "table": "^6.7.5",
-    "ip": "^1.1.8",
-    "is-ip": "^3.1.0",
     "uniqid": "^5.4.0",
-    "docker-secret": "^1.2.4"
+    "ziron-server": "9.10.0"
   },
   "devDependencies": {
-    "typescript": "^5.8.3",
+    "@types/uniqid": "^5.3.2",
+    "del": "^5.1.0",
     "gulp": "^5.0.1",
-    "gulp-optimize-js": "1.1.0",
     "gulp-terser": "1.2.0",
     "gulp-typescript": "^5.0.1",
-    "del": "^5.1.0",
     "ts-node": "^8.0.3",
-    "@types/ip": "^1.1.0",
-    "@types/uniqid": "^5.3.2"
+    "typescript": "^5.8.3"
   },
   "overrides": {
     "gulp-typescript": {

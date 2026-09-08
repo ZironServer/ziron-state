@@ -16,7 +16,7 @@ import StateServerOptions from "./StateServerOptions";
 import Logger from "./Logger";
 import {generateSecret, getRandomArrayItem} from "./Crypto";
 import * as uniqId from "uniqid";
-import ip = require('ip');
+import {localIpAddress} from './Utils';
 import isIp = require('is-ip');
 import {buildOptions} from "./Object";
 import {StandaloneProcedures} from "ziron-server/dist/lib/Procedure";
@@ -148,7 +148,7 @@ export class StateServer {
     }
 
     private _getJoinToken(): string {
-        const address = ip.address();
+        const address = localIpAddress();
         const path = this._options.path === "" || this._options.path === "/" ? "" :
             !this._options.path.startsWith("/") ? "/" + this._options.path : this._options.path;
         return `${this._options.secret ? `${this._options.secret}@` : ""}ws://${
