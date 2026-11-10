@@ -295,6 +295,8 @@ export class StateServer {
             this._selectWorkerLeader();
         }
         if(Object.keys(this._joinedWorkers).length === 0) this._resetClusterSession();
+        //its publishes that did not reach a broker are lost: the others can resync
+        else this.server.transmitToGroup("JoinedWorkers","workerLeave",nodeId);
         this._logRunningState();
     }
 
